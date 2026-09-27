@@ -97,7 +97,7 @@ TITLE = "🏫 VRChat 한국수어교실 공식 안내"
 DESCRIPTION = "\n".join([
     '> **"당신의 손짓으로 세상과의 연결을 도와드려요."**',
     "",
-    "농인과 청인이 함께 한국수어(KSL)를 배우고 소통하는 가상현실 커뮤니티입니다.",
+    "다함께 한국수어(KSL) 배우고 소통하는 가상현실 커뮤니티입니다.",
     "*(Learn KSL in VRChat / VRChatで韓国手話を学ぶ)*",
 ])
 FOOTER = "VRChat 한국수어교실 · KSL Class · 韓国手話教室"
@@ -137,7 +137,7 @@ def add_field(embed: dict, name: str, lines: list[str], *, inline: bool = False,
 
     내용은 줄 목록으로 받고, gap=True 면 줄 사이에 빈 줄을 하나씩 넣어 모바일에서도 글자가 붙지 않게 합니다.
     """
-    value = ("\n\n" if gap else "\n").join(lines)
+    value = ("\n" if gap else "\n").join(lines)
     embed.setdefault("fields", []).append({"name": name, "value": value, "inline": inline})
 
 
@@ -193,8 +193,8 @@ def build_content_embed(*, now: datetime) -> dict:
     ])
     add_field(embed, "🚀 3분 만에 수업 참여하기 (Quick Start)", [
         "1️⃣ **VRChat Group 가입**: 아래 바로가기 링크를 통해 그룹 가입 신청",
-        "2️⃣ **수업 시간 확인**: 디스코드 좌측 상단 `<이벤트>` 탭에서 현지 시각 확인",
-        "3️⃣ **교실 입장**: 정기 수업 15분 전 `[한국수어교실]` 그룹 인스턴스로 접속",
+        "2️⃣ **수업 시간 확인**: 좌측 상단 `<이벤트>` 탭에서 현지 시각 확인",
+        "3️⃣ **교실 입장**: 수업 15분 전 `[한국수어교실]` 그룹 인스턴스로 접속",
     ])
     if CLASS_SCHEDULE:
         add_field(embed, "📅 다음 수업 (Next Classes)", [
@@ -203,7 +203,7 @@ def build_content_embed(*, now: datetime) -> dict:
         ])
     add_field(embed, "🛡️ 핵심 교실 에티켓 (Core Rules)", [
         "🤟 **농문화 존중**: 비하/희화화 금지 및 서로를 존중하는 언어 사용",
-        "🤖 **AI 미디어 규칙**: AI 생성물 업로드 시 `[🤖AI-참고]` 태그 필수",
+        "🤖 **AI 미디어 규칙**: AI 생성물 업로드 시 `[🪄AI-생성]` 태그 필수",
         "🏷️ **수어 이름(Sign Name)**: 스스로 짓지 않고 농인 멘토에게 선물받는 문화 지향",
     ])
     rules = f"<#{RULES_CHANNEL_ID}>" if RULES_CHANNEL_ID else "**#규칙**"
@@ -215,7 +215,7 @@ def build_content_embed(*, now: datetime) -> dict:
         (f"📜 [한국수어교실 이벤트 참여 방법]({NOTION_EVENT_GUIDE_URL})", NOTION_EVENT_GUIDE_URL),
         (f"🤖 [디스코드 서버 이미숫 봇 안내]({NOTION_BOT_GUIDE_URL})", NOTION_BOT_GUIDE_URL),
     ]
-    add_field(embed, "🔗 바로가기 모음 (Quick Links)", [line for line, url in links if url], gap=False)
+    add_field(embed, "⬇️ 바로가기 모음 (Quick Links)", [line for line, url in links if url], gap=False)
     return embed
 
 
