@@ -62,11 +62,11 @@
 - 🇺🇸 Respect Deaf members and fellow learners. Mocking or belittling sign language or Deaf people is not allowed.
 - 🇯🇵 ろう者と学習者がお互いを尊重します。手話やろう者を侮辱したり、からかったりする表現は禁止です。
 
-### 🤖 AI 생성물은 `🤖` 태그 필수 · Tag AI Content with `🤖` · AI生成物には `🤖` タグ
+### 🤖 AI 생성물은 `[🤖AI-참고]` 태그 필수 · Tag AI Content · AI生成物にはタグ必須
 
-- 🇰🇷 AI로 만든 이미지·영상을 올릴 땐 반드시 `🤖` 태그를 붙여요. 다른 사람의 창작물을 무단으로 가져오는 것도 금지예요.
-- 🇺🇸 Always mark AI-generated images or videos with `🤖`. Reposting other people's work without permission is not allowed.
-- 🇯🇵 AIで作った画像・動画には必ず `🤖` タグを付けてください。他人の作品の無断転載も禁止です。
+- 🇰🇷 AI로 만든 이미지·영상을 올릴 땐 반드시 `[🤖AI-참고]` 태그를 붙여요. 다른 사람의 창작물을 무단으로 가져오는 것도 금지예요.
+- 🇺🇸 Always tag AI-generated images or videos with `[🤖AI-참고]`. Reposting other people's work without permission is not allowed.
+- 🇯🇵 AIで作った画像・動画には必ず `[🤖AI-참고]` タグを付けてください。他人の作品の無断転載も禁止です。
 
 ### 🏷️ 수어 이름은 선물이에요 · Name Signs Are Gifts · サインネームは贈り物
 

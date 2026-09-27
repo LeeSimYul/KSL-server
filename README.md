@@ -5,7 +5,7 @@ VRChat 한국수어교실 디스코드 서버의 `#안내` 채널을 꾸리는 �
 
 | 파일 | 하는 일 |
 | :--- | :--- |
-| [`send_welcome_embed.py`](./send_welcome_embed.py) | 씨앗반 · 별빛반 · 달빛반 학급 안내, 3단계 참여 방법, 핵심 규칙을 한/영/일로 요약한 **웰컴 Embed** 를 웹후크로 보내고, 보낸 메시지를 같은 자리에서 고칩니다. |
+| [`send_welcome_embed.py`](./send_welcome_embed.py) | 씨앗반 · 별빛반 · 달빛반 학급 안내, 3단계 참여 방법, 핵심 규칙, 바로가기를 한국어 중심으로 요약한 **웰컴 Embed** 를 웹후크로 보내고, 보낸 메시지를 같은 자리에서 고칩니다. |
 | [`docs/welcome-guide.md`](./docs/welcome-guide.md) | 같은 내용을 조금 더 자세히 풀어 쓴 **웹 가이드**. 노션이나 GitHub Pages 에 그대로 붙여 넣어 외부에 공유합니다. |
 
 ## 🚀 웰컴 Embed 보내기
@@ -34,20 +34,18 @@ VRChat 한국수어교실 디스코드 서버의 `#안내` 채널을 꾸리는 �
 
 ## ⚙️ 설정 (`send_welcome_embed.py` 맨 위)
 
-`GUIDE_CHANNEL_ID` · `RULES_CHANNEL_ID` · `VRCHAT_GROUP_URL` 은 `.env` 에 같은 이름으로 넣으면 그 값이 먼저 쓰이고, 없으면 아래 기본값을 씁니다.
+`RULES_CHANNEL_ID` · `VRCHAT_GROUP_URL` 은 `.env` 에 같은 이름으로 넣으면 그 값이 먼저 쓰이고, 없으면 아래 기본값을 씁니다.
 
 | 설정 | 기본값 | 설명 |
 | :--- | :--- | :--- |
 | `BRAND_COLOR` | `0x4A90E2` | Embed 왼쪽 띠 색 |
-| `GUIDE_CHANNEL_ID` | `1105140914839625750` | `#안내` 채널 ID. 빈 문자열이면 웹후크가 걸린 채널을 자동으로 멘션합니다. |
-| `RULES_CHANNEL_ID` | `1414463866863226983` | `#규칙` 채널 ID. 빈 문자열이면 `#규칙` 을 글자로만 적습니다. |
+| `RULES_CHANNEL_ID` | `1414463866863226983` | 바로가기 맨 아래 `📋 상세 규칙` 에 멘션할 `#규칙` 채널 ID. 빈 문자열이면 글자로만 적습니다. |
 | `VRCHAT_GROUP_URL` | `https://vrc.group/KSL.8324` | VRChat 그룹 공유 링크 |
 | `NOTION_SERVER_GUIDE_URL` | 서버 안내 가이드 노션 | 디스코드 카테고리 · 채널 안내. 비우면 링크를 뺍니다. (아래 두 개도 같음) |
 | `NOTION_EVENT_GUIDE_URL` | 이벤트 참여 방법 노션 | PC로 수업에 들어오는 방법 |
 | `NOTION_BOT_GUIDE_URL` | 이미숫 봇 설명서 노션 | 조교 봇 명령어 안내 |
-| `WEB_GUIDE_URL` | 이 저장소의 `docs/welcome-guide.md` | 제목 링크 겸 바로가기 |
-| `DISCORD_INVITE_URL` | `discord.gg/tVyvq5qZgn` | 친구 초대 링크 |
-| `LOGO_URL` · `BANNER_URL` | [Kidentity](https://github.com/LeeSimYul/Kidentity) 공식 로고 · 배너 | 빈 문자열이면 생략합니다. |
+| `WEB_GUIDE_URL` | 이 저장소의 `docs/welcome-guide.md` | 제목을 누르면 열리는 링크 |
+| `THUMBNAIL_URL` · `IMAGE_URL` · `ICON_URL` | [Kidentity](https://github.com/LeeSimYul/Kidentity) 공식 자산 | 오른쪽 위 로고(`로고 ver.2 together`) · 아래쪽 배너(`공식 타이틀 배너 together`) · 웹후크 프로필과 푸터 아이콘(`로고 ver.2 2026`). 빈 문자열이면 생략합니다. |
 | `CLASS_SCHEDULE` | (비움) | 정기 수업 시간표. 아래 참고. |
 
 > 채널 ID 는 디스코드 **설정 → 고급 → 개발자 모드**를 켠 뒤, 채널을 우클릭 → **ID 복사**로 얻습니다.

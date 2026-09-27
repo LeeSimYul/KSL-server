@@ -2,8 +2,8 @@
 send_welcome_embed.py
 VRChat 한국수어교실 - #안내 채널 웰컴 Embed 전송기 (Discord Webhook)
 
-씨앗반 · 별빛반 · 달빛반 학급 안내, 3단계 참여 방법, 핵심 규칙을 한/영/일 3개 국어로
-짧게 요약한 Embed 를 #안내 채널 웹후크로 보냅니다. 한 번 보낸 메시지는 --edit 로 같은
+씨앗반 · 별빛반 · 달빛반 학급 안내, 3단계 참여 방법, 핵심 규칙, 바로가기를 한국어 중심으로
+(영어 · 일본어는 괄호 속 짧은 이름으로) 요약한 Embed 를 #안내 채널 웹후크로 보냅니다. 한 번 보낸 메시지는 --edit 로 같은
 자리에서 고칠 수 있어서, 공지를 지우고 다시 올릴 필요가 없습니다.
 
     python send_welcome_embed.py --dry-run          # 보내지 않고 JSON 만 출력 (discohook.org 미리보기용)
@@ -44,28 +44,26 @@ else:
 BRAND_COLOR = 0x4A90E2  # KSL 브랜드 블루
 
 # .env(또는 환경 변수)에 같은 이름으로 값을 넣으면 그 값이 먼저 쓰이고, 없으면 오른쪽 기본값을 씁니다.
-# 채널 ID: 디스코드 개발자 모드 → 채널 우클릭 → 'ID 복사'. 숫자만 적습니다.
-# 빈 문자열이면 안내 채널은 웹후크가 걸린 채널로 자동 연결, 규칙 채널은 글자로만 적습니다.
-GUIDE_CHANNEL_ID = os.getenv("GUIDE_CHANNEL_ID") or "1105140914839625750"  # 📑┃안내
+# 채널 ID: 디스코드 개발자 모드 → 채널 우클릭 → 'ID 복사'. 숫자만 적습니다. (빈 문자열이면 글자로만 적습니다)
 RULES_CHANNEL_ID = os.getenv("RULES_CHANNEL_ID") or "1414463866863226983"  # 📋┃규칙
 VRCHAT_GROUP_URL = os.getenv("VRCHAT_GROUP_URL") or "https://vrc.group/KSL.8324"
 
-# 링크: 비워 둔 항목은 Embed 에서 빠집니다.
+# 링크: 비워 둔 항목은 바로가기에서 빠집니다.
 _NOTION = "https://likeable-bucket-c21.notion.site/"
 NOTION_SERVER_GUIDE_URL = _NOTION + "Discord-VRChat-175a401b541880d280e5e9920b5966af"  # 서버 · 채널 안내
 NOTION_EVENT_GUIDE_URL = _NOTION + "VRChat-189a401b541880c48656f69895bf48a9"           # 이벤트 참여 방법
 NOTION_BOT_GUIDE_URL = _NOTION + "Discord-Bot-c7dc1254368c4a4fbcdf2e1ef6ca23a4"         # 이미숫 봇 설명서
-WEB_GUIDE_URL = "https://github.com/LeeSimYul/KSL-server/blob/main/docs/welcome-guide.md"
-DISCORD_INVITE_URL = "https://discord.gg/tVyvq5qZgn"
+WEB_GUIDE_URL = "https://github.com/LeeSimYul/KSL-server/blob/main/docs/welcome-guide.md"  # 제목을 누르면 열립니다
 
 # 이미지: 공식 브랜드 저장소(Kidentity)의 원본을 그대로 씁니다. 빈 문자열이면 생략합니다.
 # 디스코드 첨부 파일 주소는 시간이 지나면 만료되니, 바꿀 때도 GitHub 처럼 고정된 주소를 쓰세요.
 _KIDENTITY_PNG = "https://raw.githubusercontent.com/LeeSimYul/Kidentity/main/assets/png/"
-LOGO_URL = _KIDENTITY_PNG + quote("logo-icon/한국수어교실 로고 ver.2 2026.png")
-BANNER_URL = _KIDENTITY_PNG + quote("discord-server-banner/VRChat 한국수어교실 디스코드 서버 배너 2.png")
+THUMBNAIL_URL = _KIDENTITY_PNG + quote("logo-icon/VRChat 한국수어교실 로고 ver.2 together.png")  # 오른쪽 위 로고
+IMAGE_URL = _KIDENTITY_PNG + quote("VRChat 한국수어교실 공식 타이틀 배너 together.png")         # 아래쪽 큰 배너
+ICON_URL = _KIDENTITY_PNG + quote("logo-icon/한국수어교실 로고 ver.2 2026.png")               # 웹후크 프로필 · 푸터
 
 WEBHOOK_USERNAME = "VRChat 한국수어교실"
-WEBHOOK_AVATAR_URL = LOGO_URL
+WEBHOOK_AVATAR_URL = ICON_URL
 
 # 정기 수업 시간표 (한국 시간 KST 기준): ("반", "요일", "HH:MM")
 #   반: seed(씨앗반) · star(별빛반) · moon(달빛반)   요일: mon~sun 또는 월~일
@@ -78,51 +76,35 @@ CLASS_SCHEDULE: list[tuple[str, str, str]] = [
 
 
 # ── 문구 ─────────────────────────────────────────────────────
+# 한국어를 중심으로 쓰고, 영어 · 일본어는 괄호 속 짧은 이름으로만 곁들입니다.
 @dataclass(frozen=True)
 class Level:
     emoji: str
-    name: str      # 반 이름
-    grade_ko: str  # 단계 (한국어)
-    grade_en: str
-    grade_ja: str
-    topic_ko: str  # 배우는 내용
-    topic_en: str
-    topic_ja: str
+    name: str   # 반 이름
+    grade: str  # 단계 (영어 / 일본어)
+    topic: str  # 배우는 내용
 
 
 LEVELS: dict[str, Level] = {
-    "seed": Level("🌱", "씨앗반", "입문", "Introductory", "入門",
-                  "지문자 · 기본 인사",
-                  "Fingerspelling & greetings", "指文字とあいさつ"),
-    "star": Level("⭐", "별빛반", "초급", "Vocabulary", "初級",
-                  "필수 단어 · 손 모양",
-                  "Everyday words & handshapes", "必須単語と手の形"),
-    "moon": Level("🌙", "달빛반", "중급", "Sentences", "中級",
-                  "문장 구성 · 비수지 신호(표정)",
-                  "Sentences & non-manual markers", "文章と非手指動作(表情)"),
+    "seed": Level("🌱", "씨앗반", "Introductory / 入門", "지문자 & 기본 인사말 (초보자 추천)"),
+    "star": Level("⭐", "별빛반", "Vocabulary / 初級", "일상생활 필수 단어 & 손 모양"),
+    "moon": Level("🌙", "달빛반", "Sentences / 中級", "문장 구성 & 비수지 신호 (실전 회화)"),
 }
 
 TITLE = "🏫 VRChat 한국수어교실 공식 안내"
-FOOTER = "VRChat 한국수어교실 · Korean Sign Language Class · 韓国手話教室"
-
 DESCRIPTION = "\n".join([
     '> **"당신의 손짓으로 세상과의 연결을 도와드려요."**',
-    "> *Let your hands connect you to the world. · あなたの手で、世界とつながろう。*",
-    "",
-    "🇰🇷 VRChat에서 농인과 청인이 함께 한국수어(**KSL**)를 배우고 소통하는 커뮤니티예요.",
-    "🇺🇸 A VRChat community where Deaf and hearing friends learn Korean Sign Language (**KSL**) together.",
-    "🇯🇵 VRChatで、ろう者と聴者が一緒に韓国手話(**KSL**)を学び、交流するコミュニティです。",
-    "",
-    "👋 처음이라면 🌱 씨앗반부터! · New here? Start with 🌱 씨앗반! · 初めての方は🌱씨앗반へ！",
+    "농인과 청인이 함께 한국수어(KSL)를 배우고 소통하는 가상현실 커뮤니티입니다.",
+    "*(Learn KSL in VRChat / VRChatで韓国手話を学ぶ)*",
 ])
+FOOTER = "VRChat 한국수어교실 · Korean Sign Language Class · 韓国手話教室"
 
-# 요일: 입력 표기 → 파이썬 weekday 번호, 번호 → (한, 영, 일) 표기
+# 요일: 입력 표기 → 파이썬 weekday 번호
 WEEKDAY_ALIASES = {
     **{name: i for i, name in enumerate(["mon", "tue", "wed", "thu", "fri", "sat", "sun"])},
     **{name: i for i, name in enumerate(["월", "화", "수", "목", "금", "토", "일"])},
 }
-WEEKDAY_LABELS = [("월", "Mon", "月"), ("화", "Tue", "火"), ("수", "Wed", "水"), ("목", "Thu", "木"),
-                  ("금", "Fri", "金"), ("토", "Sat", "土"), ("일", "Sun", "日")]
+WEEKDAY_KO = ["월", "화", "수", "목", "금", "토", "일"]
 
 KST = timezone(timedelta(hours=9), "KST")  # 한국은 서머타임이 없어 고정 오프셋이면 충분합니다
 
@@ -147,51 +129,9 @@ WEBHOOK_URL_RE = re.compile(
 
 
 # ── Embed 만들기 ──────────────────────────────────────────────
-def channel_ref(channel_id: str | None, fallback: str) -> str:
-    """채널 ID 가 있으면 클릭 가능한 멘션, 없으면 굵은 글씨 이름."""
-    return f"<#{channel_id}>" if channel_id else f"**{fallback}**"
-
-
-def build_class_field() -> dict:
-    lines: list[str] = []
-    for lv in LEVELS.values():
-        lines += [
-            f"{lv.emoji} **{lv.name}** {lv.grade_ko} · {lv.grade_en} · {lv.grade_ja}",
-            f"> {lv.topic_ko}",
-            f"> {lv.topic_en} · {lv.topic_ja}",
-        ]
-    return {"name": "🌱 학급 안내 · Class Levels · クラス案内", "value": "\n".join(lines)}
-
-
-def build_join_field(guide: str) -> dict:
-    lines = [
-        "**1️⃣ 그룹 가입** · Join the Group · グループ参加",
-        "> VRChat 그룹 검색 `한국수어교실` → 가입 요청",
-        "> Search `한국수어교실` in VRChat Groups · グループ検索 → 参加リクエスト",
-        "**2️⃣ 일정 확인** · Check the Schedule · 日程確認",
-        f"> {guide} · 이벤트 탭의 시간은 **내 현지 시간**으로 표시",
-        "> Times show in your local time · 現地時間で自動表示",
-        "**3️⃣ 수업 입장** · Join the Class · 授業に参加",
-        "> 수업 15분 전, 그룹 인스턴스(Group Instance) 입장",
-        "> Join the Group Instance 15 min early · 15分前にグループインスタンスへ",
-    ]
-    return {"name": "🚀 참여 방법 · How to Join · 参加方法", "value": "\n".join(lines)}
-
-
-def build_rules_field(rules: str) -> dict:
-    lines = [
-        "🤟 **농문화 존중** · Respect Deaf Culture · ろう文化の尊重",
-        "> 농인·학습자 서로 존중, 수어 비하·희화화 금지",
-        "> No mocking signs or Deaf people · 手話・ろう者をからかわない",
-        "🤖 **AI 태그 필수** · Tag AI Content · AI生成物はタグ必須",
-        "> AI 생성물 업로드 시 `🤖` 태그, 무단 도용 금지",
-        "> Tag AI-made media with `🤖`, no art theft · 無断転載禁止",
-        "🏷️ **수어 이름은 선물** · Name Signs Are Gifts · サインネームは贈り物",
-        "> 스스로 짓지 않고, 농인 멘토와의 교류로 받아요",
-        "> Given by Deaf mentors, not self-made · ろうの先輩から贈られるもの",
-        f"📋 전체 규칙 · Full rules · ルール全文 → {rules}",
-    ]
-    return {"name": "🛡️ 교실 규칙 · Rules & Etiquette · ルール", "value": "\n".join(lines)}
+def add_field(embed: dict, name: str, lines: list[str], *, inline: bool = False) -> None:
+    """discord.py 의 Embed.add_field 처럼 칸을 하나 붙입니다. 내용은 줄 목록으로 받습니다."""
+    embed.setdefault("fields", []).append({"name": name, "value": "\n".join(lines), "inline": inline})
 
 
 def next_class_start(weekday: int, hhmm: str, now: datetime) -> datetime:
@@ -206,79 +146,74 @@ def next_class_start(weekday: int, hhmm: str, now: datetime) -> datetime:
     return start
 
 
-def build_schedule_field(now: datetime) -> dict | None:
-    if not CLASS_SCHEDULE:
-        return None
+def schedule_lines(now: datetime) -> list[str]:
+    """시간표를 다음 수업이 빠른 순서대로, 읽는 사람의 현지 시각 타임스탬프로 적습니다."""
     slots = []
     for level_key, day, hhmm in CLASS_SCHEDULE:
         weekday = WEEKDAY_ALIASES[day.lower()]
         slots.append((next_class_start(weekday, hhmm, now), LEVELS[level_key], weekday, hhmm))
     slots.sort(key=lambda slot: slot[0])
 
-    lines: list[str] = []
+    lines = []
     for start, lv, weekday, hhmm in slots:
         ts = int(start.timestamp())
-        ko, en, ja = WEEKDAY_LABELS[weekday]
-        lines += [
-            f"{lv.emoji} **{lv.name}** · 매주 {ko} {en} {ja} {hhmm} KST",
-            f"> <t:{ts}:F> · <t:{ts}:R>",
-        ]
-    lines.append("*🕒 내 현지 시간으로 표시 · Shown in your local time · 現地時間で表示*")
-    return {"name": "📅 다음 수업 · Next Classes · 次の授業", "value": "\n".join(lines)}
+        lines.append(f"{lv.emoji} **{lv.name}** (매주 {WEEKDAY_KO[weekday]} {hhmm} KST): <t:{ts}:F> · <t:{ts}:R>")
+    return lines
 
 
-def build_links_field(guide: str) -> dict:
-    lines: list[str] = []
-    if VRCHAT_GROUP_URL:
-        lines.append(f"🌐 [VRChat 그룹 · Group · グループ]({VRCHAT_GROUP_URL})")
-    if NOTION_SERVER_GUIDE_URL:
-        lines.append(f"🧭 [서버 안내 가이드 · Server Guide (Notion)]({NOTION_SERVER_GUIDE_URL})")
-    if NOTION_EVENT_GUIDE_URL:
-        lines.append(f"📘 [이벤트 참여 방법 · How to Join Events (Notion)]({NOTION_EVENT_GUIDE_URL})")
-    if NOTION_BOT_GUIDE_URL:
-        lines.append(f"🤖 [조교 봇 이미숫 · Leemisut Bot (Notion)]({NOTION_BOT_GUIDE_URL})")
-    if WEB_GUIDE_URL:
-        lines.append(f"📖 [웹 가이드 · Web Guide · ウェブガイド]({WEB_GUIDE_URL})")
-    if DISCORD_INVITE_URL:
-        lines.append(f"💌 친구 초대 · Invite · 招待: {DISCORD_INVITE_URL}")
-    lines.append(f"📌 안내 채널 · Guide Channel · 案内チャンネル: {guide}")
-    return {"name": "🔗 바로가기 · Quick Links · リンク", "value": "\n".join(lines)}
-
-
-def build_embeds(*, now: datetime, guide_channel_id: str | None) -> list[dict]:
-    guide = channel_ref(guide_channel_id, "#안내")
-    rules = channel_ref(RULES_CHANNEL_ID or None, "#규칙")
-
-    fields = [build_class_field(), build_join_field(guide), build_rules_field(rules)]
-    schedule = build_schedule_field(now)
-    if schedule:
-        fields.append(schedule)
-    fields.append(build_links_field(guide))
-
-    guide_embed: dict = {
+def build_embed(*, now: datetime) -> dict:
+    embed: dict = {
         "title": TITLE,
         "description": DESCRIPTION,
         "color": BRAND_COLOR,
-        "fields": [{**field, "inline": False} for field in fields],
         "footer": {"text": FOOTER},
         "timestamp": now.isoformat(),  # 푸터 옆에 '마지막 수정 시각'으로 보입니다
     }
     if WEB_GUIDE_URL:
-        guide_embed["url"] = WEB_GUIDE_URL
-    if LOGO_URL:
-        guide_embed["thumbnail"] = {"url": LOGO_URL}
-        guide_embed["footer"]["icon_url"] = LOGO_URL
+        embed["url"] = WEB_GUIDE_URL
+    if THUMBNAIL_URL:
+        embed["thumbnail"] = {"url": THUMBNAIL_URL}
+    if IMAGE_URL:
+        embed["image"] = {"url": IMAGE_URL}
+    if ICON_URL:
+        embed["footer"]["icon_url"] = ICON_URL
 
-    # 배너는 이미지만 담은 Embed 를 앞에 하나 더 붙여, 안내문 위쪽 머리 그림처럼 보이게 합니다.
-    embeds = [guide_embed]
-    if BANNER_URL:
-        embeds.insert(0, {"color": BRAND_COLOR, "image": {"url": BANNER_URL}})
-    return embeds
+    add_field(embed, "🌱 학급 안내 (Class Levels)", [
+        f"{lv.emoji} **{lv.name}** ({lv.grade}): {lv.topic}" for lv in LEVELS.values()
+    ])
+    add_field(embed, "🚀 3분 만에 수업 참여하기 (Quick Start)", [
+        "1️⃣ **VRChat Group 가입**: 아래 링크를 통해 그룹 가입 신청",
+        "2️⃣ **수업 시간 확인**: 디스코드 좌측 상단 `<이벤트>` 탭에서 현지 시각 확인",
+        "3️⃣ **교실 입장**: 정기 수업 15분 전 `[한국수어교실]` 그룹 인스턴스로 접속",
+    ])
+    if CLASS_SCHEDULE:
+        add_field(embed, "📅 다음 수업 (Next Classes)", [
+            *schedule_lines(now),
+            "*🕒 내 현지 시각으로 자동 표시돼요.*",
+        ])
+    add_field(embed, "🛡️ 핵심 교실 에티켓 (Core Rules)", [
+        "🤟 **농문화 존중**: 비하/희화화 금지 및 서로를 존중하는 언어 사용",
+        "🤖 **AI 미디어 규칙**: AI 생성물 업로드 시 `[🤖AI-참고]` 태그 필수",
+        "🏷️ **수어 이름(Name Sign)**: 스스로 짓지 않고 농인 멘토에게 선물받는 문화 지향",
+    ])
+
+    links = [
+        (f"🔗 [VRChat 그룹 바로가기]({VRCHAT_GROUP_URL})", VRCHAT_GROUP_URL),
+        (f"📖 [수어교실 공식 안내 가이드]({NOTION_SERVER_GUIDE_URL})", NOTION_SERVER_GUIDE_URL),
+        (f"📜 [수어교실 이벤트 참여 방법]({NOTION_EVENT_GUIDE_URL})", NOTION_EVENT_GUIDE_URL),
+        (f"🤖 [조교 봇 이미숫 안내]({NOTION_BOT_GUIDE_URL})", NOTION_BOT_GUIDE_URL),
+    ]
+    rules = f"<#{RULES_CHANNEL_ID}>" if RULES_CHANNEL_ID else "**#규칙**"
+    add_field(embed, "🔗 바로가기 모음 (Quick Links)", [
+        *(line for line, url in links if url),
+        f"📋 상세 규칙: {rules}",
+    ])
+    return embed
 
 
-def build_payload(*, now: datetime, guide_channel_id: str | None, editing: bool) -> dict:
+def build_payload(*, now: datetime, editing: bool) -> dict:
     payload: dict = {
-        "embeds": build_embeds(now=now, guide_channel_id=guide_channel_id),
+        "embeds": [build_embed(now=now)],
         "allowed_mentions": {"parse": []},  # 혹시 문구에 멘션이 들어가도 알림은 보내지 않습니다
     }
     if not editing:  # 이름·프로필 사진은 새로 보낼 때만 정할 수 있습니다
@@ -291,9 +226,8 @@ def build_payload(*, now: datetime, guide_channel_id: str | None, editing: bool)
 # ── 검사 ─────────────────────────────────────────────────────
 def check_settings() -> list[str]:
     problems: list[str] = []
-    for label, value in (("GUIDE_CHANNEL_ID", GUIDE_CHANNEL_ID), ("RULES_CHANNEL_ID", RULES_CHANNEL_ID)):
-        if value and not value.isdigit():
-            problems.append(f"{label} 는 숫자만 적어 주세요: {value!r}")
+    if RULES_CHANNEL_ID and not RULES_CHANNEL_ID.isdigit():
+        problems.append(f"RULES_CHANNEL_ID 는 숫자만 적어 주세요: {RULES_CHANNEL_ID!r}")
     for i, slot in enumerate(CLASS_SCHEDULE, 1):
         if len(slot) != 3:
             problems.append(f"CLASS_SCHEDULE {i}번째 줄은 (반, 요일, 'HH:MM') 세 칸이어야 해요: {slot!r}")
@@ -385,15 +319,6 @@ def discord_request(method: str, url: str, *, params: dict | None = None, payloa
     raise WebhookError(f"{MAX_ATTEMPTS}번 시도했지만 요청 과다(429)가 풀리지 않았어요. 잠시 뒤 다시 실행해 주세요.")
 
 
-def fetch_webhook_channel_id(base_url: str) -> str | None:
-    """웹후크가 걸린 채널 ID. (토큰이 든 주소라면 봇 없이도 조회됩니다)"""
-    try:
-        return discord_request("GET", base_url).get("channel_id")
-    except WebhookError as e:
-        print(f"⚠️ 안내 채널을 자동으로 찾지 못해 글자로 적을게요: {e}", file=sys.stderr)
-        return None
-
-
 # ── 실행 ─────────────────────────────────────────────────────
 def parse_args(argv: list[str] | None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
@@ -423,14 +348,11 @@ def main(argv: list[str] | None = None) -> int:
     now = datetime.now(timezone.utc).replace(microsecond=0)
 
     if args.dry_run:
-        payload = build_payload(now=now, guide_channel_id=GUIDE_CHANNEL_ID or None, editing=False)
+        payload = build_payload(now=now, editing=False)
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         problems = check_limits(payload["embeds"])
         total = sum(embed_char_count(embed) for embed in payload["embeds"])
         print(f"\n📏 전체 {total}/{MAX_TOTAL_CHARS}자 · Embed {len(payload['embeds'])}개", file=sys.stderr)
-        if not GUIDE_CHANNEL_ID:
-            print("ℹ️ 미리보기에서는 #안내 멘션이 글자로 보여요. 실제 전송 때는 웹후크 채널로 자동 연결돼요.",
-                  file=sys.stderr)
         for problem in problems:
             print(f"❌ {problem}", file=sys.stderr)
         return 1 if problems else 0
@@ -443,8 +365,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         base_url, params = split_webhook_url(webhook_url)
-        guide_channel_id = GUIDE_CHANNEL_ID or fetch_webhook_channel_id(base_url)
-        payload = build_payload(now=now, guide_channel_id=guide_channel_id, editing=bool(args.edit))
+        payload = build_payload(now=now, editing=bool(args.edit))
         if problems := check_limits(payload["embeds"]):
             print("❌ 디스코드 글자 수 제한을 넘었어요.\n  - " + "\n  - ".join(problems), file=sys.stderr)
             return 1
