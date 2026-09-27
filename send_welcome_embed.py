@@ -132,13 +132,9 @@ WEBHOOK_URL_RE = re.compile(
 
 
 # ── Embed 만들기 ──────────────────────────────────────────────
-def add_field(embed: dict, name: str, lines: list[str], *, inline: bool = False, gap: bool = True) -> None:
-    """discord.py 의 Embed.add_field 처럼 칸을 하나 붙입니다.
-
-    내용은 줄 목록으로 받고, gap=True 면 줄 사이에 빈 줄을 하나씩 넣어 모바일에서도 글자가 붙지 않게 합니다.
-    """
-    value = ("\n" if gap else "\n").join(lines)
-    embed.setdefault("fields", []).append({"name": name, "value": value, "inline": inline})
+def add_field(embed: dict, name: str, lines: list[str], *, inline: bool = False) -> None:
+    """discord.py 의 Embed.add_field 처럼 칸을 하나 붙입니다. 내용은 줄 목록으로 받습니다."""
+    embed.setdefault("fields", []).append({"name": name, "value": "\n".join(lines), "inline": inline})
 
 
 def next_class_start(weekday: int, hhmm: str, now: datetime) -> datetime:
@@ -215,7 +211,7 @@ def build_content_embed(*, now: datetime) -> dict:
         (f"📜 [한국수어교실 이벤트 참여 방법]({NOTION_EVENT_GUIDE_URL})", NOTION_EVENT_GUIDE_URL),
         (f"🤖 [디스코드 서버 이미숫 봇 안내]({NOTION_BOT_GUIDE_URL})", NOTION_BOT_GUIDE_URL),
     ]
-    add_field(embed, "⬇️ 바로가기 모음 (Quick Links)", [line for line, url in links if url], gap=False)
+    add_field(embed, "⬇️ 바로가기 모음 (Quick Links)", [line for line, url in links if url])
     return embed
 
 
