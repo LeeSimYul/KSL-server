@@ -34,14 +34,18 @@ VRChat 한국수어교실 디스코드 서버의 `#안내` 채널을 꾸리는 �
 
 ## ⚙️ 설정 (`send_welcome_embed.py` 맨 위)
 
+`GUIDE_CHANNEL_ID` · `RULES_CHANNEL_ID` · `VRCHAT_GROUP_URL` 은 `.env` 에 같은 이름으로 넣으면 그 값이 먼저 쓰이고, 없으면 아래 기본값을 씁니다.
+
 | 설정 | 기본값 | 설명 |
 | :--- | :--- | :--- |
 | `BRAND_COLOR` | `0x4A90E2` | Embed 왼쪽 띠 색 |
-| `GUIDE_CHANNEL_ID` | (비움) | `#안내` 채널 ID. 비워 두면 웹후크가 걸린 채널을 자동으로 멘션합니다. |
-| `RULES_CHANNEL_ID` | (비움) | `#규칙` 채널 ID. 비워 두면 `#규칙` 을 글자로만 적습니다. |
-| `VRCHAT_GROUP_URL` | (비움) | VRChat 그룹 공유 링크. **채우면 바로가기에 그룹 링크가 추가됩니다.** |
-| `NOTION_GUIDE_URL` | 이벤트 참여 방법 노션 | 비우면 링크를 뺍니다. |
-| `WEB_GUIDE_URL` | 이 저장소의 `docs/welcome-guide.md` | 제목 링크 겸 바로가기. `main` 에 합쳐져야 열립니다. |
+| `GUIDE_CHANNEL_ID` | `1105140914839625750` | `#안내` 채널 ID. 빈 문자열이면 웹후크가 걸린 채널을 자동으로 멘션합니다. |
+| `RULES_CHANNEL_ID` | `1414463866863226983` | `#규칙` 채널 ID. 빈 문자열이면 `#규칙` 을 글자로만 적습니다. |
+| `VRCHAT_GROUP_URL` | `https://vrc.group/KSL.8324` | VRChat 그룹 공유 링크 |
+| `NOTION_SERVER_GUIDE_URL` | 서버 안내 가이드 노션 | 디스코드 카테고리 · 채널 안내. 비우면 링크를 뺍니다. (아래 두 개도 같음) |
+| `NOTION_EVENT_GUIDE_URL` | 이벤트 참여 방법 노션 | PC로 수업에 들어오는 방법 |
+| `NOTION_BOT_GUIDE_URL` | 이미숫 봇 설명서 노션 | 조교 봇 명령어 안내 |
+| `WEB_GUIDE_URL` | 이 저장소의 `docs/welcome-guide.md` | 제목 링크 겸 바로가기 |
 | `DISCORD_INVITE_URL` | `discord.gg/tVyvq5qZgn` | 친구 초대 링크 |
 | `LOGO_URL` · `BANNER_URL` | [Kidentity](https://github.com/LeeSimYul/Kidentity) 공식 로고 · 배너 | 빈 문자열이면 생략합니다. |
 | `CLASS_SCHEDULE` | (비움) | 정기 수업 시간표. 아래 참고. |

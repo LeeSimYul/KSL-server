@@ -30,24 +30,31 @@ from urllib.parse import parse_qsl, quote, urlsplit, urlunsplit
 
 import requests
 
+BASE_DIR = Path(__file__).resolve().parent
+
 try:
     from dotenv import load_dotenv
 except ImportError:  # python-dotenv 가 없으면 환경 변수만 읽습니다
-    load_dotenv = None
-
-BASE_DIR = Path(__file__).resolve().parent
+    pass
+else:
+    load_dotenv(BASE_DIR / ".env")  # 아래 설정값이 .env 를 먼저 보도록 가장 먼저 읽습니다
 
 
 # ── 서버 설정 (필요한 곳만 고쳐 쓰세요) ──────────────────────────
 BRAND_COLOR = 0x4A90E2  # KSL 브랜드 블루
 
+# .env(또는 환경 변수)에 같은 이름으로 값을 넣으면 그 값이 먼저 쓰이고, 없으면 오른쪽 기본값을 씁니다.
 # 채널 ID: 디스코드 개발자 모드 → 채널 우클릭 → 'ID 복사'. 숫자만 적습니다.
-GUIDE_CHANNEL_ID = ""  # 📑┃안내 - 비워 두면 웹후크가 걸린 채널(= #안내)을 자동으로 씁니다
-RULES_CHANNEL_ID = ""  # 📋┃규칙 - 비워 두면 채널 이름을 글자로만 적습니다
+# 빈 문자열이면 안내 채널은 웹후크가 걸린 채널로 자동 연결, 규칙 채널은 글자로만 적습니다.
+GUIDE_CHANNEL_ID = os.getenv("GUIDE_CHANNEL_ID") or "1105140914839625750"  # 📑┃안내
+RULES_CHANNEL_ID = os.getenv("RULES_CHANNEL_ID") or "1414463866863226983"  # 📋┃규칙
+VRCHAT_GROUP_URL = os.getenv("VRCHAT_GROUP_URL") or "https://vrc.group/KSL.8324"
 
 # 링크: 비워 둔 항목은 Embed 에서 빠집니다.
-VRCHAT_GROUP_URL = ""  # VRChat 그룹 페이지의 공유 링크 (예: https://vrc.group/KSL.0000)
-NOTION_GUIDE_URL = "https://likeable-bucket-c21.notion.site/VRChat-189a401b541880c48656f69895bf48a9"
+_NOTION = "https://likeable-bucket-c21.notion.site/"
+NOTION_SERVER_GUIDE_URL = _NOTION + "Discord-VRChat-175a401b541880d280e5e9920b5966af"  # 서버 · 채널 안내
+NOTION_EVENT_GUIDE_URL = _NOTION + "VRChat-189a401b541880c48656f69895bf48a9"           # 이벤트 참여 방법
+NOTION_BOT_GUIDE_URL = _NOTION + "Discord-Bot-c7dc1254368c4a4fbcdf2e1ef6ca23a4"         # 이미숫 봇 설명서
 WEB_GUIDE_URL = "https://github.com/LeeSimYul/KSL-server/blob/main/docs/welcome-guide.md"
 DISCORD_INVITE_URL = "https://discord.gg/tVyvq5qZgn"
 
@@ -224,13 +231,17 @@ def build_links_field(guide: str) -> dict:
     lines: list[str] = []
     if VRCHAT_GROUP_URL:
         lines.append(f"🌐 [VRChat 그룹 · Group · グループ]({VRCHAT_GROUP_URL})")
-    if NOTION_GUIDE_URL:
-        lines.append(f"📘 [이벤트 참여 가이드 · Event Guide (Notion)]({NOTION_GUIDE_URL})")
+    if NOTION_SERVER_GUIDE_URL:
+        lines.append(f"🧭 [서버 안내 가이드 · Server Guide (Notion)]({NOTION_SERVER_GUIDE_URL})")
+    if NOTION_EVENT_GUIDE_URL:
+        lines.append(f"📘 [이벤트 참여 방법 · How to Join Events (Notion)]({NOTION_EVENT_GUIDE_URL})")
+    if NOTION_BOT_GUIDE_URL:
+        lines.append(f"🤖 [조교 봇 이미숫 · Leemisut Bot (Notion)]({NOTION_BOT_GUIDE_URL})")
     if WEB_GUIDE_URL:
         lines.append(f"📖 [웹 가이드 · Web Guide · ウェブガイド]({WEB_GUIDE_URL})")
     if DISCORD_INVITE_URL:
         lines.append(f"💌 친구 초대 · Invite · 招待: {DISCORD_INVITE_URL}")
-    lines.append(f"📌 서버 안내 · Server Guide · サーバー案内: {guide}")
+    lines.append(f"📌 안내 채널 · Guide Channel · 案内チャンネル: {guide}")
     return {"name": "🔗 바로가기 · Quick Links · リンク", "value": "\n".join(lines)}
 
 
@@ -424,8 +435,6 @@ def main(argv: list[str] | None = None) -> int:
             print(f"❌ {problem}", file=sys.stderr)
         return 1 if problems else 0
 
-    if load_dotenv is not None:
-        load_dotenv(BASE_DIR / ".env")
     webhook_url = os.getenv("DISCORD_WEBHOOK_URL", "").strip()
     if not webhook_url:
         print("❌ DISCORD_WEBHOOK_URL 이 비어 있어요. 환경 변수나 .env 에 웹후크 주소를 넣어 주세요.",

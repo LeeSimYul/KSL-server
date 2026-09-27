@@ -34,9 +34,9 @@
 
 ### 1️⃣ VRChat 그룹 가입 · Join the VRChat Group · グループに参加
 
-- 🇰🇷 VRChat 그룹 검색창에 `한국수어교실` 을 검색해 가입을 요청해요.
-- 🇺🇸 Search for `한국수어교실` in VRChat Groups and request to join.
-- 🇯🇵 VRChatのグループ検索で `한국수어교실` を検索し、参加リクエストを送ります。
+- 🇰🇷 [VRChat 그룹 페이지](https://vrc.group/KSL.8324)에서 가입을 요청해요. (VRChat 그룹 검색창에 `한국수어교실` 을 검색해도 돼요)
+- 🇺🇸 Request to join on the [VRChat Group page](https://vrc.group/KSL.8324), or search for `한국수어교실` in VRChat Groups.
+- 🇯🇵 [VRChatグループページ](https://vrc.group/KSL.8324)から参加リクエストを送ります。(グループ検索で `한국수어교실` と検索してもOK)
 
 ### 2️⃣ 일정 확인 · Check the Schedule · 日程を確認
 
@@ -74,7 +74,9 @@
 - 🇺🇸 Please don't make up your own name sign. In Deaf culture, a name sign is a gift you receive from Deaf mentors through real connection.
 - 🇯🇵 サインネームは自分で作りません。ろうのメンターとの交流を通じて「贈り物」として受け取る、ろう文化を大切にしましょう。
 
-> 📋 전체 규정은 디스코드 `#규칙` 채널에서 확인해 주세요. · Full rules: the `#규칙` channel on Discord. · ルール全文はDiscordの `#규칙` チャンネルへ。
+> 📋 전체 규정은 디스코드 **📋┃규칙** 채널에서 확인해 주세요. 서버의 채널 구성은 [서버 안내 가이드 (Notion)](https://likeable-bucket-c21.notion.site/Discord-VRChat-175a401b541880d280e5e9920b5966af)에 정리돼 있어요.
+>
+> Full rules: the **📋┃규칙** channel on our [Discord](https://discord.gg/tVyvq5qZgn). · ルール全文はDiscordの **📋┃규칙** チャンネルへ。
 
 ---
 
@@ -83,8 +85,9 @@
 | 바로가기 · Link | 설명 · Description |
 | :--- | :--- |
 | 💬 [디스코드 서버 · Discord](https://discord.gg/tVyvq5qZgn) | 수업 알림 · 일정 · 대화 / Class announcements, schedule & chat |
-| 🌐 VRChat 그룹 · Group | VRChat → Groups → `한국수어교실` 검색 / Search in VRChat Groups |
-| 📘 [이벤트 참여 방법 · Event Guide (Notion)](https://likeable-bucket-c21.notion.site/VRChat-189a401b541880c48656f69895bf48a9) | PC로 수업에 들어오는 방법 / How to join a class on PC |
+| 🌐 [VRChat 그룹 · Group](https://vrc.group/KSL.8324) | 가입 요청 · 그룹 인스턴스 입장 / Join the group & its instances |
+| 🧭 [서버 안내 가이드 · Server Guide (Notion)](https://likeable-bucket-c21.notion.site/Discord-VRChat-175a401b541880d280e5e9920b5966af) | 디스코드 카테고리 · 채널 안내 / Discord categories & channels |
+| 📘 [이벤트 참여 방법 · How to Join Events (Notion)](https://likeable-bucket-c21.notion.site/VRChat-189a401b541880c48656f69895bf48a9) | PC로 수업에 들어오는 방법 / How to join a class on PC |
 | 🤖 [조교 봇 이미숫 · Leemisut Bot (Notion)](https://likeable-bucket-c21.notion.site/Discord-Bot-c7dc1254368c4a4fbcdf2e1ef6ca23a4) | `/오늘의수어` · `/수어퀴즈` 로 디스코드에서 복습 / Daily signs & quizzes on Discord |
 
 ---
