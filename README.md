@@ -45,8 +45,8 @@ VRChat 한국수어교실 디스코드 서버의 `#안내` 채널을 꾸리는 �
 | `NOTION_EVENT_GUIDE_URL` | 이벤트 참여 방법 노션 | PC로 수업에 들어오는 방법 |
 | `NOTION_BOT_GUIDE_URL` | 이미숫 봇 설명서 노션 | 조교 봇 명령어 안내 |
 | `WEB_GUIDE_URL` | 이 저장소의 `docs/welcome-guide.md` | 제목을 누르면 열리는 링크 |
-| `THUMBNAIL_URL` · `IMAGE_URL` · `ICON_URL` | [Kidentity](https://github.com/LeeSimYul/Kidentity) 공식 자산 | 오른쪽 위 로고(`로고 ver.2 together`) · 아래쪽 배너(`공식 타이틀 배너 together`) · 웹후크 프로필과 푸터 아이콘(`로고 ver.2 2026`). 빈 문자열이면 생략합니다. |
-| `CLASS_SCHEDULE` | (비움) | 정기 수업 시간표. 아래 참고. |
+| `BANNER_URL` · `THUMBNAIL_URL` · `ICON_URL` | [Kidentity](https://github.com/LeeSimYul/Kidentity) 공식 자산 | 메시지 맨 위 배너 Embed(`공식 타이틀 배너 together`) · 본문 오른쪽 위 로고와 웹후크 프로필 · 푸터 아이콘(`로고 ver.2 together`). `BANNER_URL` 을 비우면 배너 Embed 없이 본문만 보냅니다. |
+| `CLASS_SCHEDULE` | 별빛반 매주 일 22:00 | 정기 수업 시간표. 아래 참고. |
 
 > 채널 ID 는 디스코드 **설정 → 고급 → 개발자 모드**를 켠 뒤, 채널을 우클릭 → **ID 복사**로 얻습니다.
 

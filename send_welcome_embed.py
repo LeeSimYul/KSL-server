@@ -3,8 +3,8 @@ send_welcome_embed.py
 VRChat 한국수어교실 - #안내 채널 웰컴 Embed 전송기 (Discord Webhook)
 
 씨앗반 · 별빛반 · 달빛반 학급 안내, 3단계 참여 방법, 핵심 규칙, 바로가기를 한국어 중심으로
-(영어 · 일본어는 괄호 속 짧은 이름으로) 요약한 Embed 를 #안내 채널 웹후크로 보냅니다. 한 번 보낸 메시지는 --edit 로 같은
-자리에서 고칠 수 있어서, 공지를 지우고 다시 올릴 필요가 없습니다.
+(영어 · 일본어는 괄호 속 짧은 이름으로) 요약해, [맨 위 배너] + [본문] 두 Embed 로 #안내 채널 웹후크에
+보냅니다. 한 번 보낸 메시지는 --edit 로 같은 자리에서 고칠 수 있어서, 공지를 지우고 다시 올릴 필요가 없습니다.
 
     python send_welcome_embed.py --dry-run          # 보내지 않고 JSON 만 출력 (discohook.org 미리보기용)
     python send_welcome_embed.py                    # 새 메시지로 전송 → 메시지 ID 출력
@@ -57,10 +57,11 @@ WEB_GUIDE_URL = "https://github.com/LeeSimYul/KSL-server/blob/main/docs/welcome-
 
 # 이미지: 공식 브랜드 저장소(Kidentity)의 원본을 그대로 씁니다. 빈 문자열이면 생략합니다.
 # 디스코드 첨부 파일 주소는 시간이 지나면 만료되니, 바꿀 때도 GitHub 처럼 고정된 주소를 쓰세요.
+# (Kidentity 에 banner_kksl.png · logo_kksl.png 를 올리면 아래 경로를 그 파일 이름으로 바꾸면 됩니다)
 _KIDENTITY_PNG = "https://raw.githubusercontent.com/LeeSimYul/Kidentity/main/assets/png/"
-THUMBNAIL_URL = _KIDENTITY_PNG + quote("logo-icon/VRChat 한국수어교실 로고 ver.2 together.png")  # 오른쪽 위 로고
-IMAGE_URL = _KIDENTITY_PNG + quote("VRChat 한국수어교실 공식 타이틀 배너 together.png")         # 아래쪽 큰 배너
-ICON_URL = _KIDENTITY_PNG + quote("logo-icon/한국수어교실 로고 ver.2 2026.png")               # 웹후크 프로필 · 푸터
+BANNER_URL = _KIDENTITY_PNG + quote("VRChat 한국수어교실 공식 타이틀 배너 together.png")        # 맨 위 배너 Embed
+THUMBNAIL_URL = _KIDENTITY_PNG + quote("logo-icon/VRChat 한국수어교실 로고 ver.2 together.png")  # 본문 오른쪽 위 로고
+ICON_URL = THUMBNAIL_URL                                                                     # 웹후크 프로필 · 푸터
 
 WEBHOOK_USERNAME = "VRChat 한국수어교실"
 WEBHOOK_AVATAR_URL = ICON_URL
@@ -72,6 +73,7 @@ WEBHOOK_AVATAR_URL = ICON_URL
 # 비워 두면 칸을 생략합니다.
 CLASS_SCHEDULE: list[tuple[str, str, str]] = [
     # ("seed", "sat", "21:00"),
+    ("star", "sun", "22:00"),
 ]
 
 
@@ -94,10 +96,11 @@ LEVELS: dict[str, Level] = {
 TITLE = "🏫 VRChat 한국수어교실 공식 안내"
 DESCRIPTION = "\n".join([
     '> **"당신의 손짓으로 세상과의 연결을 도와드려요."**',
+    "",
     "농인과 청인이 함께 한국수어(KSL)를 배우고 소통하는 가상현실 커뮤니티입니다.",
     "*(Learn KSL in VRChat / VRChatで韓国手話を学ぶ)*",
 ])
-FOOTER = "VRChat 한국수어교실 · Korean Sign Language Class · 韓国手話教室"
+FOOTER = "VRChat 한국수어교실 · KSL Class · 韓国手話教室"
 
 # 요일: 입력 표기 → 파이썬 weekday 번호
 WEEKDAY_ALIASES = {
@@ -129,9 +132,13 @@ WEBHOOK_URL_RE = re.compile(
 
 
 # ── Embed 만들기 ──────────────────────────────────────────────
-def add_field(embed: dict, name: str, lines: list[str], *, inline: bool = False) -> None:
-    """discord.py 의 Embed.add_field 처럼 칸을 하나 붙입니다. 내용은 줄 목록으로 받습니다."""
-    embed.setdefault("fields", []).append({"name": name, "value": "\n".join(lines), "inline": inline})
+def add_field(embed: dict, name: str, lines: list[str], *, inline: bool = False, gap: bool = True) -> None:
+    """discord.py 의 Embed.add_field 처럼 칸을 하나 붙입니다.
+
+    내용은 줄 목록으로 받고, gap=True 면 줄 사이에 빈 줄을 하나씩 넣어 모바일에서도 글자가 붙지 않게 합니다.
+    """
+    value = ("\n\n" if gap else "\n").join(lines)
+    embed.setdefault("fields", []).append({"name": name, "value": value, "inline": inline})
 
 
 def next_class_start(weekday: int, hhmm: str, now: datetime) -> datetime:
@@ -157,11 +164,16 @@ def schedule_lines(now: datetime) -> list[str]:
     lines = []
     for start, lv, weekday, hhmm in slots:
         ts = int(start.timestamp())
-        lines.append(f"{lv.emoji} **{lv.name}** (매주 {WEEKDAY_KO[weekday]} {hhmm} KST): <t:{ts}:F> · <t:{ts}:R>")
+        lines.append(f"{lv.emoji} **{lv.name}** (매주 {WEEKDAY_KO[weekday]} {hhmm} KST): <t:{ts}:F>")
     return lines
 
 
-def build_embed(*, now: datetime) -> dict:
+def build_banner_embed() -> dict:
+    """맨 위에 배너 그림만 보여 주는 Embed. (한 Embed 안에서는 큰 그림이 항상 맨 아래에 붙기 때문입니다)"""
+    return {"color": BRAND_COLOR, "image": {"url": BANNER_URL}}
+
+
+def build_content_embed(*, now: datetime) -> dict:
     embed: dict = {
         "title": TITLE,
         "description": DESCRIPTION,
@@ -173,47 +185,51 @@ def build_embed(*, now: datetime) -> dict:
         embed["url"] = WEB_GUIDE_URL
     if THUMBNAIL_URL:
         embed["thumbnail"] = {"url": THUMBNAIL_URL}
-    if IMAGE_URL:
-        embed["image"] = {"url": IMAGE_URL}
     if ICON_URL:
         embed["footer"]["icon_url"] = ICON_URL
 
-    add_field(embed, "🌱 학급 안내 (Class Levels)", [
-        f"{lv.emoji} **{lv.name}** ({lv.grade}): {lv.topic}" for lv in LEVELS.values()
+    add_field(embed, "📝 학급 안내 (Class Levels)", [
+        f"{lv.emoji} `{lv.name}` ({lv.grade}): {lv.topic}" for lv in LEVELS.values()
     ])
     add_field(embed, "🚀 3분 만에 수업 참여하기 (Quick Start)", [
-        "1️⃣ **VRChat Group 가입**: 아래 링크를 통해 그룹 가입 신청",
+        "1️⃣ **VRChat Group 가입**: 아래 바로가기 링크를 통해 그룹 가입 신청",
         "2️⃣ **수업 시간 확인**: 디스코드 좌측 상단 `<이벤트>` 탭에서 현지 시각 확인",
         "3️⃣ **교실 입장**: 정기 수업 15분 전 `[한국수어교실]` 그룹 인스턴스로 접속",
     ])
     if CLASS_SCHEDULE:
         add_field(embed, "📅 다음 수업 (Next Classes)", [
             *schedule_lines(now),
-            "*🕒 내 현지 시각으로 자동 표시돼요.*",
+            "🕒 *내 현지 시각으로 자동 표시돼요.*",
         ])
     add_field(embed, "🛡️ 핵심 교실 에티켓 (Core Rules)", [
         "🤟 **농문화 존중**: 비하/희화화 금지 및 서로를 존중하는 언어 사용",
         "🤖 **AI 미디어 규칙**: AI 생성물 업로드 시 `[🤖AI-참고]` 태그 필수",
-        "🏷️ **수어 이름(Name Sign)**: 스스로 짓지 않고 농인 멘토에게 선물받는 문화 지향",
+        "🏷️ **수어 이름(Sign Name)**: 스스로 짓지 않고 농인 멘토에게 선물받는 문화 지향",
     ])
+    rules = f"<#{RULES_CHANNEL_ID}>" if RULES_CHANNEL_ID else "**#규칙**"
+    add_field(embed, "📜 상세 규칙 (Full Rules)", [f"📋 서버 상세 이용 규칙 및 가이드라인: {rules}"])
 
     links = [
         (f"🔗 [VRChat 그룹 바로가기]({VRCHAT_GROUP_URL})", VRCHAT_GROUP_URL),
-        (f"📖 [수어교실 공식 안내 가이드]({NOTION_SERVER_GUIDE_URL})", NOTION_SERVER_GUIDE_URL),
-        (f"📜 [수어교실 이벤트 참여 방법]({NOTION_EVENT_GUIDE_URL})", NOTION_EVENT_GUIDE_URL),
-        (f"🤖 [조교 봇 이미숫 안내]({NOTION_BOT_GUIDE_URL})", NOTION_BOT_GUIDE_URL),
+        (f"📖 [한국수어교실 공식 안내 가이드]({NOTION_SERVER_GUIDE_URL})", NOTION_SERVER_GUIDE_URL),
+        (f"📜 [한국수어교실 이벤트 참여 방법]({NOTION_EVENT_GUIDE_URL})", NOTION_EVENT_GUIDE_URL),
+        (f"🤖 [디스코드 서버 이미숫 봇 안내]({NOTION_BOT_GUIDE_URL})", NOTION_BOT_GUIDE_URL),
     ]
-    rules = f"<#{RULES_CHANNEL_ID}>" if RULES_CHANNEL_ID else "**#규칙**"
-    add_field(embed, "🔗 바로가기 모음 (Quick Links)", [
-        *(line for line, url in links if url),
-        f"📋 상세 규칙: {rules}",
-    ])
+    add_field(embed, "🔗 바로가기 모음 (Quick Links)", [line for line, url in links if url], gap=False)
     return embed
+
+
+def build_embeds(*, now: datetime) -> list[dict]:
+    """[맨 위 배너] + [본문] 두 Embed 를 한 메시지로 보냅니다. 배너 주소가 비어 있으면 본문만 보냅니다."""
+    embeds = [build_content_embed(now=now)]
+    if BANNER_URL:
+        embeds.insert(0, build_banner_embed())
+    return embeds
 
 
 def build_payload(*, now: datetime, editing: bool) -> dict:
     payload: dict = {
-        "embeds": [build_embed(now=now)],
+        "embeds": build_embeds(now=now),
         "allowed_mentions": {"parse": []},  # 혹시 문구에 멘션이 들어가도 알림은 보내지 않습니다
     }
     if not editing:  # 이름·프로필 사진은 새로 보낼 때만 정할 수 있습니다
