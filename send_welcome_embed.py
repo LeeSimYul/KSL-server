@@ -88,16 +88,16 @@ class Level:
 
 
 LEVELS: dict[str, Level] = {
-    "seed": Level("🌱", "씨앗반", "Introductory / 入門", "지문자 & 기본 인사말 (초보자 추천)"),
+    "seed": Level("🌱", "씨앗반", "Introductory / 入門", "지문자 & 인사말 (초보자 추천)"),
     "star": Level("⭐", "별빛반", "Vocabulary / 初級", "일상생활 필수 단어 & 손 모양"),
-    "moon": Level("🌙", "달빛반", "Sentences / 中級", "문장 구성 & 비수지 신호 (실전 회화)"),
+    "moon": Level("🌙", "달빛반", "Sentences / 中級", "문장 구성 & 비수지 (실전 회화)"),
 }
 
 TITLE = "🏫 VRChat 한국수어교실 공식 안내"
 DESCRIPTION = "\n".join([
     '> **"당신의 손짓으로 세상과의 연결을 도와드려요."**',
     "",
-    "다함께 한국수어(KSL) 배우고 소통하는 가상현실 커뮤니티입니다.",
+    "한국수어(KSL) 배우고 소통하는 가상현실 커뮤니티입니다.",
     "*(Learn KSL in VRChat / VRChatで韓国手話を学ぶ)*",
 ])
 FOOTER = "VRChat 한국수어교실 · KSL Class · 韓国手話教室"
@@ -132,9 +132,13 @@ WEBHOOK_URL_RE = re.compile(
 
 
 # ── Embed 만들기 ──────────────────────────────────────────────
-def add_field(embed: dict, name: str, lines: list[str], *, inline: bool = False) -> None:
-    """discord.py 의 Embed.add_field 처럼 칸을 하나 붙입니다. 내용은 줄 목록으로 받습니다."""
-    embed.setdefault("fields", []).append({"name": name, "value": "\n".join(lines), "inline": inline})
+def add_field(embed: dict, name: str, lines: list[str], *, inline: bool = False, gap: bool = True) -> None:
+    """discord.py 의 Embed.add_field 처럼 칸을 하나 붙입니다.
+
+    내용은 줄 목록으로 받고, gap=True 면 줄 사이에 빈 줄을 하나씩 넣어 모바일에서도 글자가 붙지 않게 합니다.
+    """
+    value = ("\n" if gap else "\n").join(lines)
+    embed.setdefault("fields", []).append({"name": name, "value": value, "inline": inline})
 
 
 def next_class_start(weekday: int, hhmm: str, now: datetime) -> datetime:
@@ -188,9 +192,9 @@ def build_content_embed(*, now: datetime) -> dict:
         f"{lv.emoji} `{lv.name}` ({lv.grade}): {lv.topic}" for lv in LEVELS.values()
     ])
     add_field(embed, "🚀 3분 만에 수업 참여하기 (Quick Start)", [
-        "1️⃣ **VRChat Group 가입**: 아래 바로가기 링크를 통해 그룹 가입 신청",
+        "1️⃣ **VRChat Group 가입**: 아래 바로가기 링크로 그룹 가입 신청",
         "2️⃣ **수업 시간 확인**: 좌측 상단 `<이벤트>` 탭에서 현지 시각 확인",
-        "3️⃣ **교실 입장**: 수업 15분 전 `[한국수어교실]` 그룹 인스턴스로 접속",
+        "3️⃣ **교실 입장**: 수업 15분 전 `[한국수어교실]` 그룹 인스턴스 접속",
     ])
     if CLASS_SCHEDULE:
         add_field(embed, "📅 다음 수업 (Next Classes)", [
@@ -211,7 +215,7 @@ def build_content_embed(*, now: datetime) -> dict:
         (f"📜 [한국수어교실 이벤트 참여 방법]({NOTION_EVENT_GUIDE_URL})", NOTION_EVENT_GUIDE_URL),
         (f"🤖 [디스코드 서버 이미숫 봇 안내]({NOTION_BOT_GUIDE_URL})", NOTION_BOT_GUIDE_URL),
     ]
-    add_field(embed, "⬇️ 바로가기 모음 (Quick Links)", [line for line, url in links if url])
+    add_field(embed, "⬇️ 바로가기 모음 (Quick Links)", [line for line, url in links if url], gap=False)
     return embed
 
 
